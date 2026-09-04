@@ -268,11 +268,20 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    const GIFT_ABOVE_1000 = "Premium Leather Wallet"; 
-    const GIFT_BELOW_1000 = "Special Coffee Mug";      
+    let configuredGiftBelow = "Standard Gift 🎁";
+    let configuredGiftAbove = "Premium Dessert Waffle 🧇";
 
     let currentPhone = "";
-    let customerData = { name: "", amount: 0, stamps: 0 };
+    let customerData = { name: "", lastAmount: 0, totalSpent: 0, stamps: 0, gift: "" };
+
+    // Real-time listener for Admin configured gifts
+    database.ref('settings/gifts').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const gifts = snapshot.val();
+            if (gifts.below1000) configuredGiftBelow = gifts.below1000;
+            if (gifts.above1000) configuredGiftAbove = gifts.above1000;
+        }
+    });
 
     function sanitizePhone(phone) {
         return phone.replace(/\D/g, '');
@@ -296,7 +305,7 @@
                     document.getElementById('custName').value = customerData.name;
                 }
             } else {
-                customerData = { name: "", amount: 0, stamps: 0 };
+                customerData = { name: "", lastAmount: 0, totalSpent: 0, stamps: 0, gift: "" };
             }
             checkPendingAndRender();
         });
@@ -309,10 +318,18 @@
         });
     }
 
+    // Direct check on Total Spent (No average calculation)
+    function determineGiftName(totalSpent) {
+        const total = parseFloat(totalSpent) || 0;
+        return total >= 1000 ? configuredGiftAbove : configuredGiftBelow;
+    }
+
     function updateUI(myPending) {
         document.getElementById('display-name').innerText = "Customer: " + (customerData.name || (currentPhone ? "New Customer" : "Please Enter Phone"));
         document.getElementById('display-phone').innerText = "Phone: " + (currentPhone || "--");
-        document.getElementById('display-amount').innerText = "Last Bill Amount: ₹" + (customerData.amount || 0);
+        
+        // Displays Last Bill Amount to customer
+        document.getElementById('display-amount').innerText = "Last Bill: ₹" + (customerData.lastAmount || 0);
 
         for (let i = 1; i <= 5; i++) {
             const slot = document.getElementById(`slot-${i}`);
@@ -352,7 +369,10 @@
             statusMsg.style.display = 'none';
             rewardMsg.style.display = 'block';
             reqSection.style.display = 'none';
-            giftDisplay.innerText = "🎁 " + (customerData.amount >= 1000 ? GIFT_ABOVE_1000 : GIFT_BELOW_1000);
+            
+            // Evaluates Total Spent directly against ₹1000 limit
+            const finalGift = customerData.gift || determineGiftName(customerData.totalSpent);
+            giftDisplay.innerText = "🎁 " + finalGift;
         }
     }
 
@@ -395,9 +415,12 @@
     function claimAndResetCard() {
         if (!currentPhone) return;
 
-        if (confirm("Have you received your gift? Clicking OK will reset your stamps to start a new card!")) {
+        if (confirm("Have you received your gift? Clicking OK will reset your stamps and spending total to start a new card!")) {
             database.ref('customers/' + currentPhone).update({
-                stamps: 0
+                stamps: 0,
+                totalSpent: 0,
+                lastAmount: 0,
+                gift: ""
             }, (error) => {
                 if (error) {
                     alert("Error resetting card: " + error.message);
