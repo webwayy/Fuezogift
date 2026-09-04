@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loyalty Admin Dashboard</title>
+    <title>Admin Dashboard - Loyalty Card</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6F2932;
             --primary-dark: #4A1B22;
-            --bg: #F3F4F6;
-            --text-dark: #1F2937;
-            --text-muted: #6B7280;
+            --gold: #FFB800;
+            --bg: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
             --success: #10B981;
             --danger: #EF4444;
-            --blue: #2563EB;
+            --border: #E2E8F0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,50 +24,94 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
-            color: var(--text-dark);
+            color: var(--text-main);
             padding: 24px 16px;
+            min-height: 100vh;
         }
 
-        .container { max-width: 550px; margin: 0 auto; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
-        h2 {
-            font-size: 22px;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .brand-title {
+            font-size: 20px;
             font-weight: 800;
             color: var(--primary);
-            text-align: center;
-            margin-bottom: 24px;
+            text-transform: uppercase;
         }
 
-        .admin-card {
-            background: #ffffff;
-            padding: 22px;
+        .section-card {
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-            border: 1px solid #E5E7EB;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        /* Highlighting Pending Requests Top Box */
+        .requests-card {
+            border: 2px solid #F59E0B;
+            background: #FFFBEB;
         }
 
         .section-title {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--text-dark);
+            color: var(--text-main);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 8px;
         }
 
-        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
 
         .input-field {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #E5E7EB;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
             border-radius: 12px;
             font-family: inherit;
             font-size: 13px;
             outline: none;
             transition: all 0.2s;
+            background: #ffffff;
         }
 
         .input-field:focus {
@@ -73,71 +119,82 @@
             box-shadow: 0 0 0 3px rgba(111, 41, 50, 0.1);
         }
 
-        .btn-row { display: flex; gap: 10px; }
-
         .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
             border: none;
-            padding: 12px;
+            padding: 12px 20px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            color: #fff;
-            flex: 1;
             transition: all 0.2s;
-        }
-
-        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
-        .btn-blue { background: #2563EB; }
-        .btn-approve { background: #10B981; }
-        .btn-reject { background: #EF4444; }
-
-        .cust-badge {
-            background: #EFF6FF;
-            border: 1px solid #BFDBFE;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            color: #1E40AF;
-            margin-bottom: 10px;
-            display: none;
-            font-weight: 600;
-        }
-
-        .request-card {
-            background: #ffffff;
-            padding: 16px;
-            border-radius: 14px;
-            border: 1px solid #E5E7EB;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
-        .info h4 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
-        .info p { font-size: 12px; color: var(--text-muted); }
-        .actions { display: flex; gap: 6px; }
+        .btn:hover { opacity: 0.95; transform: translateY(-1px); }
 
-        .no-data { text-align: center; color: var(--text-muted); font-size: 13px; padding: 10px 0; }
-        
-        .gift-tag {
-            background: #FEF3C7;
-            color: #92400E;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 700;
-            display: inline-block;
-            margin-top: 4px;
-            font-size: 12px;
+        .btn-success { background: linear-gradient(135deg, #10B981, #059669); }
+        .btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); }
+
+        .table-responsive {
+            overflow-x: auto;
         }
 
-        label {
-            font-size: 12px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        th {
+            background: #F1F5F9;
+            padding: 12px 16px;
             font-weight: 700;
             color: var(--text-muted);
-            margin-bottom: -4px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-gold { background: #FEF3C7; color: #D97706; }
+        .badge-primary { background: #FCE7F3; color: var(--primary); }
+        .badge-count { background: #EF4444; color: #FFFFFF; border-radius: 50px; padding: 2px 8px; font-size: 12px; }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .helper-text {
+            font-size: 11px;
+            color: #10B981;
+            font-weight: 600;
+            margin-top: 2px;
+            display: none;
         }
     </style>
 
@@ -147,52 +204,93 @@
 <body>
 
 <div class="container">
-    <h2>Cashier Dashboard</h2>
-
-    <!-- Gift Settings Section -->
-    <div class="admin-card">
-        <div class="section-title">🎁 Configure Gifts for 5th Stamp</div>
-        <div class="input-group">
-            <label>Gift for Average Bill Below ₹1000:</label>
-            <input type="text" id="giftBelow1000" class="input-field" placeholder="e.g., Free Beverage ☕">
-            
-            <label>Gift for Average Bill ₹1000 or Above:</label>
-            <input type="text" id="giftAbove1000" class="input-field" placeholder="e.g., Premium Dessert 🧇">
-        </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="saveGiftSettings()">⚙️ Save Gift Settings</button>
+    <div class="header">
+        <div class="brand-title">Admin Dashboard</div>
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Manage Requests & Loyalty Cards</div>
     </div>
 
-    <!-- Manage Customer & Stamp Section -->
-    <div class="admin-card">
-        <div class="section-title">⚡ Manage Customer & Stamp</div>
-        <div class="input-group">
-            <div style="display:flex; gap:8px;">
-                <input type="tel" id="adminPhone" class="input-field" placeholder="Mobile Number" style="flex:1;">
-                <button class="btn btn-blue" onclick="fetchCustomerInfo()" style="flex:0 0 90px; padding:0;">Fetch</button>
-            </div>
-            
-            <div id="custInfoBadge" class="cust-badge">
-                <div>Current Stamps: <strong id="currentStampsVal">0</strong> / 5</div>
-                <div>Total Bill Spent: ₹<strong id="currentTotalSpent">0</strong></div>
-                <div style="margin-top: 4px; color: #047857;">5th Stamp Eligible Gift: <strong id="currentGiftVal">None</strong></div>
-            </div>
-
-            <input type="text" id="adminName" class="input-field" placeholder="Customer Name">
-            <input type="number" id="adminAmount" class="input-field" placeholder="Current Bill Amount (₹)">
-            <input type="number" id="adminStamps" class="input-field" placeholder="Set Specific Stamp Count (0-5)" min="0" max="5">
+    <!-- 1. PENDING STAMP REQUESTS SECTION (TOP PRIORITY VISIBILITY) -->
+    <div class="section-card requests-card">
+        <div class="section-title" style="color: #B45309;">
+            <span>📩 Pending Stamp Requests</span>
+            <span id="req-count-badge" class="badge badge-count">0</span>
         </div>
-
-        <div class="btn-row">
-            <button class="btn btn-approve" onclick="quickAddOneStamp()">⚡ +1 Stamp</button>
-            <button class="btn btn-primary" onclick="saveDirectCustomer()">💾 Save / Set</button>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Phone</th>
+                        <th>Bill Amount</th>
+                        <th>Current Stamps</th>
+                        <th>Current Total Spent</th>
+                        <th>Eligible Gift (At 5th)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-tbody">
+                    <tr><td colspan="7" class="empty-state">Loading pending requests...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Pending Stamp Requests Section -->
-    <div class="admin-card">
-        <div class="section-title">⏳ Pending Stamp Requests</div>
-        <div id="requests-list">
-            <p class="no-data">Loading requests...</p>
+    <!-- 2. DIRECT ADD CUSTOMER SECTION WITH AUTO-FILL -->
+    <div class="section-card" style="border-left: 5px solid var(--primary);">
+        <div class="section-title">➕ Add New Stamp / Customer Manually</div>
+        <div class="grid-3">
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="tel" id="addCustPhone" class="input-field" placeholder="10-digit Mobile Number" oninput="autoFetchName()">
+                <span id="auto-fill-status" class="helper-text">✓ Existing Customer Found!</span>
+            </div>
+            <div class="input-group">
+                <label>Customer Name</label>
+                <input type="text" id="addCustName" class="input-field" placeholder="Enter Name">
+            </div>
+            <div class="input-group">
+                <label>Bill Amount (₹)</label>
+                <input type="number" id="addBillAmount" class="input-field" placeholder="Enter Bill Amount">
+            </div>
+        </div>
+        <button class="btn btn-success" style="margin-top: 16px;" onclick="manualAddCustomer()">➕ Add / Update Customer</button>
+    </div>
+
+    <!-- 3. GIFT SETTINGS SECTION -->
+    <div class="section-card">
+        <div class="section-title">⚙️ Configure Gifts (Based on Total Spent)</div>
+        <div class="grid-2">
+            <div class="input-group">
+                <label>Gift for Total Spent Below ₹1000</label>
+                <input type="text" id="giftBelow" class="input-field" placeholder="e.g., Standard Dessert">
+            </div>
+            <div class="input-group">
+                <label>Gift for Total Spent ₹1000 & Above</label>
+                <input type="text" id="giftAbove" class="input-field" placeholder="e.g., Premium Waffle">
+            </div>
+        </div>
+        <button class="btn" style="margin-top: 16px;" onclick="saveGiftSettings()">💾 Save Settings</button>
+    </div>
+
+    <!-- 4. APPROVED CUSTOMERS LIST SECTION -->
+    <div class="section-card">
+        <div class="section-title">👥 All Active Customers</div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Stamps</th>
+                        <th>Last Bill</th>
+                        <th>Total Spent (Admin Only)</th>
+                        <th>Unlocked Gift</th>
+                    </tr>
+                </thead>
+                <tbody id="customers-tbody">
+                    <tr><td colspan="6" class="empty-state">Loading customers data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -212,205 +310,233 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let configuredGiftBelow = "Free Beverage ☕";
-    let configuredGiftAbove = "Premium Dessert 🧇";
+    let configuredGiftBelow = "Standard Gift 🎁";
+    let configuredGiftAbove = "Premium Dessert Waffle 🧇";
 
-    // Load configured gifts from Firebase
-    database.ref('settings/gifts').on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            const gifts = snapshot.val();
-            configuredGiftBelow = gifts.below1000 || "Free Beverage ☕";
-            configuredGiftAbove = gifts.above1000 || "Premium Dessert 🧇";
-            
-            document.getElementById('giftBelow1000').value = configuredGiftBelow;
-            document.getElementById('giftAbove1000').value = configuredGiftAbove;
-        }
-    });
+    window.onload = function() {
+        loadSettings();
+        listenToRequests();
+        listenToCustomers();
+    };
+
+    function sanitizePhone(phone) {
+        return phone.replace(/\D/g, '');
+    }
+
+    function loadSettings() {
+        database.ref('settings/gifts').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const gifts = snapshot.val();
+                configuredGiftBelow = gifts.below1000 || configuredGiftBelow;
+                configuredGiftAbove = gifts.above1000 || configuredGiftAbove;
+
+                document.getElementById('giftBelow').value = configuredGiftBelow;
+                document.getElementById('giftAbove').value = configuredGiftAbove;
+            }
+        });
+    }
 
     function saveGiftSettings() {
-        const below = document.getElementById('giftBelow1000').value.trim();
-        const above = document.getElementById('giftAbove1000').value.trim();
+        const below = document.getElementById('giftBelow').value.trim();
+        const above = document.getElementById('giftAbove').value.trim();
 
         if (!below || !above) {
-            alert("Please enter names for both gifts!");
+            alert("Please enter both gift titles!");
             return;
         }
 
         database.ref('settings/gifts').set({
             below1000: below,
             above1000: above
-        }).then(() => {
-            alert("Gift Settings Saved Successfully!");
+        }, (error) => {
+            if (error) alert("Error saving settings: " + error.message);
+            else alert("Gift settings saved successfully!");
         });
     }
 
-    function sanitizePhone(phone) {
-        return phone.replace(/\D/g, '');
+    function getEligibleGift(totalSpent, stampCount) {
+        if (stampCount < 5) return "Unlocks at 5th Stamp";
+        return totalSpent >= 1000 ? configuredGiftAbove : configuredGiftBelow;
     }
 
-    // Calculate Eligible Gift based on average spending
-    function getEligibleGift(totalAmount, newStampsCount) {
-        if (newStampsCount < 5) return "Unlocks at 5th Stamp";
-        
-        const avgAmount = totalAmount / 5;
-        return avgAmount >= 1000 ? configuredGiftAbove : configuredGiftBelow;
+    // Auto-fetch Customer Name based on entered Phone Number
+    function autoFetchName() {
+        const rawPhone = document.getElementById('addCustPhone').value.trim();
+        const phone = sanitizePhone(rawPhone);
+        const nameField = document.getElementById('addCustName');
+        const statusSpan = document.getElementById('auto-fill-status');
+
+        if (phone.length === 10) {
+            database.ref('customers/' + phone).once('value').then((snapshot) => {
+                if (snapshot.exists() && snapshot.val().name) {
+                    nameField.value = snapshot.val().name;
+                    statusSpan.style.display = 'block';
+                } else {
+                    statusSpan.style.display = 'none';
+                }
+            });
+        } else {
+            statusSpan.style.display = 'none';
+        }
     }
 
-    function fetchCustomerInfo() {
-        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
-        if (!phone || phone.length < 10) {
-            alert("Please enter a valid 10-digit Phone Number!");
+    // Manual Add / Update Customer Function
+    function manualAddCustomer() {
+        const name = document.getElementById('addCustName').value.trim();
+        const rawPhone = document.getElementById('addCustPhone').value.trim();
+        const phone = sanitizePhone(rawPhone);
+        const amount = parseFloat(document.getElementById('addBillAmount').value);
+
+        if (!name || !phone || phone.length < 10 || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid Name, 10-digit Phone Number, and Bill Amount!");
             return;
         }
 
         database.ref('customers/' + phone).once('value').then((snapshot) => {
-            const badge = document.getElementById('custInfoBadge');
-            badge.style.display = 'block';
+            let currentStamps = 0;
+            let currentSpent = 0;
 
             if (snapshot.exists()) {
-                const data = snapshot.val();
-                document.getElementById('adminName').value = data.name || "";
-                document.getElementById('currentStampsVal').innerText = data.stamps || 0;
-                document.getElementById('currentTotalSpent').innerText = data.totalSpent || 0;
-                document.getElementById('currentGiftVal').innerText = getEligibleGift(data.totalSpent || 0, data.stamps || 0);
-            } else {
-                document.getElementById('adminName').value = "";
-                document.getElementById('adminAmount').value = "";
-                document.getElementById('currentStampsVal').innerText = "0 (New)";
-                document.getElementById('currentTotalSpent').innerText = "0";
-                document.getElementById('currentGiftVal').innerText = "Unlocks at 5th Stamp";
+                const c = snapshot.val();
+                currentStamps = c.stamps || 0;
+                currentSpent = c.totalSpent || 0;
             }
-        });
-    }
 
-    function quickAddOneStamp() {
-        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
-        const name = document.getElementById('adminName').value.trim();
-        const amount = parseFloat(document.getElementById('adminAmount').value) || 0;
+            const newStamps = currentStamps + 1;
+            const newTotalSpent = currentSpent + amount;
 
-        if (!phone || phone.length < 10) {
-            alert("Please enter a valid 10-digit Phone Number!");
-            return;
-        }
-
-        database.ref('customers/' + phone).once('value').then((snapshot) => {
-            let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
-            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
-
-            let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
-            let updatedTotalSpent = currentStamps >= 5 ? amount : (currentTotalSpent + amount);
-
-            let eligibleGift = getEligibleGift(updatedTotalSpent, updatedStamps);
+            let assignedGift = "";
+            if (newStamps >= 5) {
+                assignedGift = getEligibleGift(newTotalSpent, newStamps);
+            }
 
             database.ref('customers/' + phone).set({
-                name: name || (snapshot.exists() ? snapshot.val().name : "Customer"),
+                name: name,
+                stamps: newStamps,
                 lastAmount: amount,
-                totalSpent: updatedTotalSpent,
-                stamps: updatedStamps,
-                gift: eligibleGift
-            }).then(() => {
-                alert(`Added +1 Stamp!\nTotal Stamps: ${updatedStamps}/5\nEligible Gift: ${eligibleGift}`);
-                fetchCustomerInfo();
-            });
-        });
-    }
-
-    function saveDirectCustomer() {
-        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
-        const name = document.getElementById('adminName').value.trim();
-        const amount = parseFloat(document.getElementById('adminAmount').value) || 0;
-        let stamps = parseInt(document.getElementById('adminStamps').value);
-
-        if (!phone || phone.length < 10) {
-            alert("Please enter a valid 10-digit Phone Number!");
-            return;
-        }
-
-        if (isNaN(stamps)) {
-            alert("Please enter a stamp count to set!");
-            return;
-        }
-
-        if (stamps < 0) stamps = 0;
-        if (stamps > 5) stamps = 5;
-
-        database.ref('customers/' + phone).once('value').then((snapshot) => {
-            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
-            let updatedTotalSpent = currentTotalSpent + amount;
-            let eligibleGift = getEligibleGift(updatedTotalSpent, stamps);
-
-            database.ref('customers/' + phone).set({
-                name: name || "Customer",
-                lastAmount: amount,
-                totalSpent: updatedTotalSpent,
-                stamps: stamps,
-                gift: eligibleGift
+                totalSpent: newTotalSpent,
+                gift: assignedGift
             }, (error) => {
                 if (error) {
-                    alert("Error: " + error.message);
+                    alert("Failed to add customer: " + error.message);
                 } else {
-                    alert(`Saved successfully!\nStamp set to: ${stamps}\nGift: ${eligibleGift}`);
-                    fetchCustomerInfo();
+                    alert(`Successfully added/updated customer ${name}! New Stamp: ${newStamps}/5`);
+                    document.getElementById('addCustName').value = '';
+                    document.getElementById('addCustPhone').value = '';
+                    document.getElementById('addBillAmount').value = '';
+                    document.getElementById('auto-fill-status').style.display = 'none';
                 }
             });
         });
     }
 
-    database.ref('requests').on('value', (snapshot) => {
-        const requestsList = document.getElementById('requests-list');
-        requestsList.innerHTML = "";
+    function listenToRequests() {
+        database.ref('requests').on('value', (snapshot) => {
+            const tbody = document.getElementById('requests-tbody');
+            const reqBadge = document.getElementById('req-count-badge');
+            tbody.innerHTML = '';
 
-        if (!snapshot.exists()) {
-            requestsList.innerHTML = `<p class="no-data">No pending stamp requests! 🎉</p>`;
-            return;
+            if (!snapshot.exists()) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No pending requests 🎉</td></tr>';
+                reqBadge.innerText = '0';
+                return;
+            }
+
+            const requests = snapshot.val();
+            const count = Object.keys(requests).length;
+            reqBadge.innerText = count;
+
+            for (let phone in requests) {
+                const req = requests[phone];
+
+                database.ref('customers/' + phone).once('value').then((custSnap) => {
+                    let currentStamps = 0;
+                    let currentSpent = 0;
+
+                    if (custSnap.exists()) {
+                        const c = custSnap.val();
+                        currentStamps = c.stamps || 0;
+                        currentSpent = c.totalSpent || 0;
+                    }
+
+                    const newTotalSpent = currentSpent + req.amount;
+                    const nextStamp = currentStamps + 1;
+                    const eligibleGift = getEligibleGift(newTotalSpent, nextStamp);
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><strong>${req.name}</strong></td>
+                        <td>${req.phone}</td>
+                        <td><span class="badge badge-primary">₹${req.amount}</span></td>
+                        <td>${currentStamps}/5</td>
+                        <td><strong>₹${currentSpent}</strong></td>
+                        <td><span class="badge badge-gold">${eligibleGift}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-success" onclick="approveRequest('${req.phone}', '${req.name}', ${req.amount}, ${currentStamps}, ${currentSpent})">✓ Approve</button>
+                                <button class="btn btn-danger" onclick="rejectRequest('${req.phone}')">✕ Reject</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        });
+    }
+
+    function approveRequest(phone, name, amount, currentStamps, currentSpent) {
+        const newStamps = currentStamps + 1;
+        const newTotalSpent = currentSpent + amount;
+        
+        let assignedGift = "";
+        if (newStamps >= 5) {
+            assignedGift = getEligibleGift(newTotalSpent, newStamps);
         }
 
-        const data = snapshot.val();
-        Object.keys(data).forEach((phone) => {
-            const req = data[phone];
-            
-            const card = document.createElement('div');
-            card.className = 'request-card';
-            card.innerHTML = `
-                <div class="info">
-                    <h4>${req.name}</h4>
-                    <p><b>Phone:</b> ${req.phone} | <b>Bill:</b> ₹${req.amount}</p>
-                </div>
-                <div class="actions">
-                    <button class="btn btn-approve" style="padding:6px 12px; font-size:12px;" onclick="approveRequest('${req.phone}', ${req.amount}, '${req.name}')">Approve</button>
-                    <button class="btn btn-reject" style="padding:6px 12px; font-size:12px;" onclick="rejectRequest('${req.phone}')">Reject</button>
-                </div>
-            `;
-            requestsList.appendChild(card);
-        });
-    });
-
-    function approveRequest(phone, amount, name) {
-        database.ref('customers/' + phone).once('value').then((snapshot) => {
-            let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
-            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
-
-            let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
-            let updatedTotalSpent = currentStamps >= 5 ? amount : (currentTotalSpent + amount);
-
-            let eligibleGift = getEligibleGift(updatedTotalSpent, updatedStamps);
-
-            database.ref('customers/' + phone).set({
-                name: name,
-                lastAmount: amount,
-                totalSpent: updatedTotalSpent,
-                stamps: updatedStamps,
-                gift: eligibleGift
-            }).then(() => {
-                database.ref('requests/' + phone).remove();
-            });
+        database.ref('customers/' + phone).set({
+            name: name,
+            stamps: newStamps,
+            lastAmount: amount,
+            totalSpent: newTotalSpent,
+            gift: assignedGift
+        }).then(() => {
+            return database.ref('requests/' + phone).remove();
+        }).catch((err) => {
+            alert("Error approving request: " + err.message);
         });
     }
 
     function rejectRequest(phone) {
-        if (confirm("Reject this request?")) {
+        if (confirm("Are you sure you want to reject this request?")) {
             database.ref('requests/' + phone).remove();
         }
+    }
+
+    function listenToCustomers() {
+        database.ref('customers').on('value', (snapshot) => {
+            const tbody = document.getElementById('customers-tbody');
+            tbody.innerHTML = '';
+
+            if (!snapshot.exists()) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No customers recorded yet.</td></tr>';
+                return;
+            }
+
+            const customers = snapshot.val();
+            for (let phone in customers) {
+                const c = customers[phone];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${c.name || 'Unknown'}</strong></td>
+                    <td>${phone}</td>
+                    <td><span class="badge badge-primary">${c.stamps || 0}/5</span></td>
+                    <td>₹${c.lastAmount || 0}</td>
+                    <td><strong>₹${c.totalSpent || 0}</strong></td>
+                    <td><span class="badge badge-gold">${c.gift || (c.stamps >= 5 ? getEligibleGift(c.totalSpent, c.stamps) : 'Pending 5th Stamp')}</span></td>
+                `;
+                tbody.appendChild(tr);
+            }
+        });
     }
 </script>
 
