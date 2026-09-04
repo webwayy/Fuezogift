@@ -121,6 +121,24 @@
         .actions { display: flex; gap: 6px; }
 
         .no-data { text-align: center; color: var(--text-muted); font-size: 13px; padding: 10px 0; }
+        
+        .gift-tag {
+            background: #FEF3C7;
+            color: #92400E;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: -4px;
+        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -131,6 +149,20 @@
 <div class="container">
     <h2>Cashier Dashboard</h2>
 
+    <!-- Gift Settings Section -->
+    <div class="admin-card">
+        <div class="section-title">🎁 Configure Gifts for 5th Stamp</div>
+        <div class="input-group">
+            <label>Gift for Average Bill Below ₹1000:</label>
+            <input type="text" id="giftBelow1000" class="input-field" placeholder="e.g., Free Beverage ☕">
+            
+            <label>Gift for Average Bill ₹1000 or Above:</label>
+            <input type="text" id="giftAbove1000" class="input-field" placeholder="e.g., Premium Dessert 🧇">
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="saveGiftSettings()">⚙️ Save Gift Settings</button>
+    </div>
+
+    <!-- Manage Customer & Stamp Section -->
     <div class="admin-card">
         <div class="section-title">⚡ Manage Customer & Stamp</div>
         <div class="input-group">
@@ -140,11 +172,13 @@
             </div>
             
             <div id="custInfoBadge" class="cust-badge">
-                Current Stamps: <strong id="currentStampsVal">0</strong> / 5
+                <div>Current Stamps: <strong id="currentStampsVal">0</strong> / 5</div>
+                <div>Total Bill Spent: ₹<strong id="currentTotalSpent">0</strong></div>
+                <div style="margin-top: 4px; color: #047857;">5th Stamp Eligible Gift: <strong id="currentGiftVal">None</strong></div>
             </div>
 
             <input type="text" id="adminName" class="input-field" placeholder="Customer Name">
-            <input type="number" id="adminAmount" class="input-field" placeholder="Bill Amount (₹)">
+            <input type="number" id="adminAmount" class="input-field" placeholder="Current Bill Amount (₹)">
             <input type="number" id="adminStamps" class="input-field" placeholder="Set Specific Stamp Count (0-5)" min="0" max="5">
         </div>
 
@@ -154,6 +188,7 @@
         </div>
     </div>
 
+    <!-- Pending Stamp Requests Section -->
     <div class="admin-card">
         <div class="section-title">⏳ Pending Stamp Requests</div>
         <div id="requests-list">
@@ -177,8 +212,48 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    let configuredGiftBelow = "Free Beverage ☕";
+    let configuredGiftAbove = "Premium Dessert 🧇";
+
+    // Load configured gifts from Firebase
+    database.ref('settings/gifts').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const gifts = snapshot.val();
+            configuredGiftBelow = gifts.below1000 || "Free Beverage ☕";
+            configuredGiftAbove = gifts.above1000 || "Premium Dessert 🧇";
+            
+            document.getElementById('giftBelow1000').value = configuredGiftBelow;
+            document.getElementById('giftAbove1000').value = configuredGiftAbove;
+        }
+    });
+
+    function saveGiftSettings() {
+        const below = document.getElementById('giftBelow1000').value.trim();
+        const above = document.getElementById('giftAbove1000').value.trim();
+
+        if (!below || !above) {
+            alert("Please enter names for both gifts!");
+            return;
+        }
+
+        database.ref('settings/gifts').set({
+            below1000: below,
+            above1000: above
+        }).then(() => {
+            alert("Gift Settings Saved Successfully!");
+        });
+    }
+
     function sanitizePhone(phone) {
         return phone.replace(/\D/g, '');
+    }
+
+    // Calculate Eligible Gift based on average spending
+    function getEligibleGift(totalAmount, newStampsCount) {
+        if (newStampsCount < 5) return "Unlocks at 5th Stamp";
+        
+        const avgAmount = totalAmount / 5;
+        return avgAmount >= 1000 ? configuredGiftAbove : configuredGiftBelow;
     }
 
     function fetchCustomerInfo() {
@@ -195,12 +270,15 @@
             if (snapshot.exists()) {
                 const data = snapshot.val();
                 document.getElementById('adminName').value = data.name || "";
-                document.getElementById('adminAmount').value = data.amount || "";
                 document.getElementById('currentStampsVal').innerText = data.stamps || 0;
+                document.getElementById('currentTotalSpent').innerText = data.totalSpent || 0;
+                document.getElementById('currentGiftVal').innerText = getEligibleGift(data.totalSpent || 0, data.stamps || 0);
             } else {
                 document.getElementById('adminName').value = "";
                 document.getElementById('adminAmount').value = "";
                 document.getElementById('currentStampsVal').innerText = "0 (New)";
+                document.getElementById('currentTotalSpent').innerText = "0";
+                document.getElementById('currentGiftVal').innerText = "Unlocks at 5th Stamp";
             }
         });
     }
@@ -217,14 +295,21 @@
 
         database.ref('customers/' + phone).once('value').then((snapshot) => {
             let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
+            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
+
             let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
+            let updatedTotalSpent = currentStamps >= 5 ? amount : (currentTotalSpent + amount);
+
+            let eligibleGift = getEligibleGift(updatedTotalSpent, updatedStamps);
 
             database.ref('customers/' + phone).set({
                 name: name || (snapshot.exists() ? snapshot.val().name : "Customer"),
-                amount: amount,
-                stamps: updatedStamps
+                lastAmount: amount,
+                totalSpent: updatedTotalSpent,
+                stamps: updatedStamps,
+                gift: eligibleGift
             }).then(() => {
-                alert(`Added +1 Stamp! Total Stamps: ${updatedStamps}`);
+                alert(`Added +1 Stamp!\nTotal Stamps: ${updatedStamps}/5\nEligible Gift: ${eligibleGift}`);
                 fetchCustomerInfo();
             });
         });
@@ -249,17 +334,25 @@
         if (stamps < 0) stamps = 0;
         if (stamps > 5) stamps = 5;
 
-        database.ref('customers/' + phone).set({
-            name: name || "Customer",
-            amount: amount,
-            stamps: stamps
-        }, (error) => {
-            if (error) {
-                alert("Error: " + error.message);
-            } else {
-                alert(`Saved successfully! Stamp set to: ${stamps}`);
-                fetchCustomerInfo();
-            }
+        database.ref('customers/' + phone).once('value').then((snapshot) => {
+            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
+            let updatedTotalSpent = currentTotalSpent + amount;
+            let eligibleGift = getEligibleGift(updatedTotalSpent, stamps);
+
+            database.ref('customers/' + phone).set({
+                name: name || "Customer",
+                lastAmount: amount,
+                totalSpent: updatedTotalSpent,
+                stamps: stamps,
+                gift: eligibleGift
+            }, (error) => {
+                if (error) {
+                    alert("Error: " + error.message);
+                } else {
+                    alert(`Saved successfully!\nStamp set to: ${stamps}\nGift: ${eligibleGift}`);
+                    fetchCustomerInfo();
+                }
+            });
         });
     }
 
@@ -275,6 +368,7 @@
         const data = snapshot.val();
         Object.keys(data).forEach((phone) => {
             const req = data[phone];
+            
             const card = document.createElement('div');
             card.className = 'request-card';
             card.innerHTML = `
@@ -294,12 +388,19 @@
     function approveRequest(phone, amount, name) {
         database.ref('customers/' + phone).once('value').then((snapshot) => {
             let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
+            let currentTotalSpent = snapshot.exists() ? (snapshot.val().totalSpent || 0) : 0;
+
             let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
+            let updatedTotalSpent = currentStamps >= 5 ? amount : (currentTotalSpent + amount);
+
+            let eligibleGift = getEligibleGift(updatedTotalSpent, updatedStamps);
 
             database.ref('customers/' + phone).set({
                 name: name,
-                amount: amount,
-                stamps: updatedStamps
+                lastAmount: amount,
+                totalSpent: updatedTotalSpent,
+                stamps: updatedStamps,
+                gift: eligibleGift
             }).then(() => {
                 database.ref('requests/' + phone).remove();
             });
