@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loyalty Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6F2932;
+            --primary-dark: #4A1B22;
+            --bg: #F3F4F6;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #2563EB;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            padding: 24px 16px;
+        }
+
+        .container { max-width: 550px; margin: 0 auto; }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .admin-card {
+            background: #ffffff;
+            padding: 22px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(111, 41, 50, 0.1);
+        }
+
+        .btn-row { display: flex; gap: 10px; }
+
+        .btn {
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            color: #fff;
+            flex: 1;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+        .btn-blue { background: #2563EB; }
+        .btn-approve { background: #10B981; }
+        .btn-reject { background: #EF4444; }
+
+        .cust-badge {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #1E40AF;
+            margin-bottom: 10px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .request-card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info h4 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+        .info p { font-size: 12px; color: var(--text-muted); }
+        .actions { display: flex; gap: 6px; }
+
+        .no-data { text-align: center; color: var(--text-muted); font-size: 13px; padding: 10px 0; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Cashier Dashboard</h2>
+
+    <div class="admin-card">
+        <div class="section-title">⚡ Manage Customer & Stamp</div>
+        <div class="input-group">
+            <div style="display:flex; gap:8px;">
+                <input type="tel" id="adminPhone" class="input-field" placeholder="Mobile Number" style="flex:1;">
+                <button class="btn btn-blue" onclick="fetchCustomerInfo()" style="flex:0 0 90px; padding:0;">Fetch</button>
+            </div>
+            
+            <div id="custInfoBadge" class="cust-badge">
+                Current Stamps: <strong id="currentStampsVal">0</strong> / 5
+            </div>
+
+            <input type="text" id="adminName" class="input-field" placeholder="Customer Name">
+            <input type="number" id="adminAmount" class="input-field" placeholder="Bill Amount (₹)">
+            <input type="number" id="adminStamps" class="input-field" placeholder="Set Specific Stamp Count (0-5)" min="0" max="5">
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-approve" onclick="quickAddOneStamp()">⚡ +1 Stamp</button>
+            <button class="btn btn-primary" onclick="saveDirectCustomer()">💾 Save / Set</button>
+        </div>
+    </div>
+
+    <div class="admin-card">
+        <div class="section-title">⏳ Pending Stamp Requests</div>
+        <div id="requests-list">
+            <p class="no-data">Loading requests...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfpExFFKCSBCQM21T1...",
+        authDomain: "fuezogift.firebaseapp.com",
+        databaseURL: "https://fuezogift-default-rtdb.firebaseio.com",
+        projectId: "fuezogift",
+        storageBucket: "fuezogift.firebasestorage.app",
+        messagingSenderId: "308068716118",
+        appId: "1:308068716118:web:d085f8...",
+        measurementId: "G-FYR51N21FC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    function sanitizePhone(phone) {
+        return phone.replace(/\D/g, '');
+    }
+
+    function fetchCustomerInfo() {
+        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
+        if (!phone || phone.length < 10) {
+            alert("Please enter a valid 10-digit Phone Number!");
+            return;
+        }
+
+        database.ref('customers/' + phone).once('value').then((snapshot) => {
+            const badge = document.getElementById('custInfoBadge');
+            badge.style.display = 'block';
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                document.getElementById('adminName').value = data.name || "";
+                document.getElementById('adminAmount').value = data.amount || "";
+                document.getElementById('currentStampsVal').innerText = data.stamps || 0;
+            } else {
+                document.getElementById('adminName').value = "";
+                document.getElementById('adminAmount').value = "";
+                document.getElementById('currentStampsVal').innerText = "0 (New)";
+            }
+        });
+    }
+
+    function quickAddOneStamp() {
+        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
+        const name = document.getElementById('adminName').value.trim();
+        const amount = parseFloat(document.getElementById('adminAmount').value) || 0;
+
+        if (!phone || phone.length < 10) {
+            alert("Please enter a valid 10-digit Phone Number!");
+            return;
+        }
+
+        database.ref('customers/' + phone).once('value').then((snapshot) => {
+            let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
+            let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
+
+            database.ref('customers/' + phone).set({
+                name: name || (snapshot.exists() ? snapshot.val().name : "Customer"),
+                amount: amount,
+                stamps: updatedStamps
+            }).then(() => {
+                alert(`Added +1 Stamp! Total Stamps: ${updatedStamps}`);
+                fetchCustomerInfo();
+            });
+        });
+    }
+
+    function saveDirectCustomer() {
+        const phone = sanitizePhone(document.getElementById('adminPhone').value.trim());
+        const name = document.getElementById('adminName').value.trim();
+        const amount = parseFloat(document.getElementById('adminAmount').value) || 0;
+        let stamps = parseInt(document.getElementById('adminStamps').value);
+
+        if (!phone || phone.length < 10) {
+            alert("Please enter a valid 10-digit Phone Number!");
+            return;
+        }
+
+        if (isNaN(stamps)) {
+            alert("Please enter a stamp count to set!");
+            return;
+        }
+
+        if (stamps < 0) stamps = 0;
+        if (stamps > 5) stamps = 5;
+
+        database.ref('customers/' + phone).set({
+            name: name || "Customer",
+            amount: amount,
+            stamps: stamps
+        }, (error) => {
+            if (error) {
+                alert("Error: " + error.message);
+            } else {
+                alert(`Saved successfully! Stamp set to: ${stamps}`);
+                fetchCustomerInfo();
+            }
+        });
+    }
+
+    database.ref('requests').on('value', (snapshot) => {
+        const requestsList = document.getElementById('requests-list');
+        requestsList.innerHTML = "";
+
+        if (!snapshot.exists()) {
+            requestsList.innerHTML = `<p class="no-data">No pending stamp requests! 🎉</p>`;
+            return;
+        }
+
+        const data = snapshot.val();
+        Object.keys(data).forEach((phone) => {
+            const req = data[phone];
+            const card = document.createElement('div');
+            card.className = 'request-card';
+            card.innerHTML = `
+                <div class="info">
+                    <h4>${req.name}</h4>
+                    <p><b>Phone:</b> ${req.phone} | <b>Bill:</b> ₹${req.amount}</p>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-approve" style="padding:6px 12px; font-size:12px;" onclick="approveRequest('${req.phone}', ${req.amount}, '${req.name}')">Approve</button>
+                    <button class="btn btn-reject" style="padding:6px 12px; font-size:12px;" onclick="rejectRequest('${req.phone}')">Reject</button>
+                </div>
+            `;
+            requestsList.appendChild(card);
+        });
+    });
+
+    function approveRequest(phone, amount, name) {
+        database.ref('customers/' + phone).once('value').then((snapshot) => {
+            let currentStamps = snapshot.exists() ? (snapshot.val().stamps || 0) : 0;
+            let updatedStamps = currentStamps >= 5 ? 1 : currentStamps + 1;
+
+            database.ref('customers/' + phone).set({
+                name: name,
+                amount: amount,
+                stamps: updatedStamps
+            }).then(() => {
+                database.ref('requests/' + phone).remove();
+            });
+        });
+    }
+
+    function rejectRequest(phone) {
+        if (confirm("Reject this request?")) {
+            database.ref('requests/' + phone).remove();
+        }
+    }
+</script>
+
+</body>
+</html>

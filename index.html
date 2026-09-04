@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Loyalty Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6F2932;
+            --primary-dark: #4A1B22;
+            --gold: #FFB800;
+            --gold-light: #FFF8E7;
+            --bg: #F3F4F6;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --success: #10B981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 15px;
+        }
+
+        .container { width: 100%; max-width: 420px; }
+
+        .card-container {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            padding: 28px 22px;
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header { text-align: center; margin-bottom: 22px; }
+
+        .brand-name {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), #a23a48);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .login-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #F9FAFB;
+            padding: 6px;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: var(--text-dark);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(111, 41, 50, 0.1);
+        }
+
+        .login-box .input-field { border: none; background: transparent; }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(111, 41, 50, 0.2);
+        }
+
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(111, 41, 50, 0.3); }
+
+        .btn-check { width: auto; white-space: nowrap; padding: 10px 18px; }
+
+        .cust-profile {
+            background: linear-gradient(135deg, #FFF5F6, #FDEDF0);
+            border: 1px solid rgba(111, 41, 50, 0.12);
+            border-radius: 18px;
+            padding: 16px;
+            margin-bottom: 22px;
+        }
+
+        .cust-profile h4 { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .cust-profile p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+        .stamp-grid { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 22px; }
+
+        .stamp-slot {
+            flex: 1;
+            aspect-ratio: 1;
+            background: #F3F4F6;
+            border: 2px dashed #D1D5DB;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #9CA3AF;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .stamp-slot.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: 2px solid var(--primary);
+            color: #ffffff;
+            transform: scale(1.06);
+            box-shadow: 0 6px 14px rgba(111, 41, 50, 0.25);
+        }
+
+        .stamp-slot.gift-slot { border-color: var(--gold); background: var(--gold-light); color: var(--gold); }
+
+        .stamp-slot.gift-slot.active {
+            background: linear-gradient(135deg, #FFB800, #F59E0B);
+            color: #ffffff;
+            animation: pulse-gift 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-gift {
+            from { transform: scale(1.05); box-shadow: 0 4px 12px rgba(255, 184, 0, 0.3); }
+            to { transform: scale(1.12); box-shadow: 0 8px 20px rgba(255, 184, 0, 0.5); }
+        }
+
+        .status-box {
+            background: #F9FAFB;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 18px;
+            border: 1px solid #E5E7EB;
+            color: var(--text-muted);
+        }
+
+        .reward-unlocked {
+            display: none;
+            background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+            color: #065F46;
+            padding: 20px 16px;
+            border-radius: 18px;
+            border: 1px solid #A7F3D0;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .gift-title-text {
+            font-size: 16px;
+            color: #047857;
+            margin: 10px 0 14px 0;
+            display: block;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px dashed #34D399;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .btn-claim {
+            background: linear-gradient(135deg, #10B981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="card-container">
+        <div class="card-header">
+            <div class="brand-name">Fuezogift</div>
+            <div class="card-title">Customer Loyalty Card</div>
+        </div>
+
+        <div class="login-box">
+            <input type="tel" id="searchPhone" class="input-field" placeholder="Mobile Number">
+            <button class="btn btn-check" onclick="loadCustomerCard()">Check Card</button>
+        </div>
+
+        <div class="cust-profile">
+            <h4 id="display-name">Customer: Enter Phone</h4>
+            <p id="display-phone">Phone: --</p>
+            <p id="display-amount" style="margin-top:4px; font-weight:700; color:var(--primary);">Last Bill: ₹0</p>
+        </div>
+
+        <div class="stamp-grid">
+            <div class="stamp-slot" id="slot-1">1</div>
+            <div class="stamp-slot" id="slot-2">2</div>
+            <div class="stamp-slot" id="slot-3">3</div>
+            <div class="stamp-slot" id="slot-4">4</div>
+            <div class="stamp-slot gift-slot" id="slot-5">🎁</div>
+        </div>
+
+        <div id="status-message" class="status-box">Enter phone number above to view your card</div>
+
+        <div id="reward-message" class="reward-unlocked">
+            🎉 Congratulations!<br>
+            <span style="font-size:12px; font-weight:500; color:#047857;">You Unlocked Free Gift:</span>
+            <strong class="gift-title-text" id="gift-name-display">--</strong>
+            <button class="btn btn-claim" onclick="claimAndResetCard()">🎁 Claim Gift & Reset Card</button>
+        </div>
+
+        <div id="request-section" class="input-group">
+            <input type="text" id="custName" class="input-field" placeholder="Your Name">
+            <input type="number" id="billAmount" class="input-field" placeholder="Bill Amount (₹)">
+            <button class="btn" onclick="sendStampRequest()">📩 Request Stamp</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCfpExFFKCSBCQM21T1...",
+        authDomain: "fuezogift.firebaseapp.com",
+        databaseURL: "https://fuezogift-default-rtdb.firebaseio.com",
+        projectId: "fuezogift",
+        storageBucket: "fuezogift.firebasestorage.app",
+        messagingSenderId: "308068716118",
+        appId: "1:308068716118:web:d085f8...",
+        measurementId: "G-FYR51N21FC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const GIFT_ABOVE_1000 = "Premium Leather Wallet"; 
+    const GIFT_BELOW_1000 = "Special Coffee Mug";      
+
+    let currentPhone = "";
+    let customerData = { name: "", amount: 0, stamps: 0 };
+
+    function sanitizePhone(phone) {
+        return phone.replace(/\D/g, '');
+    }
+
+    function loadCustomerCard() {
+        const rawPhone = document.getElementById('searchPhone').value.trim();
+        const phone = sanitizePhone(rawPhone);
+
+        if (!phone || phone.length < 10) {
+            alert("Please enter a valid 10-digit Phone Number!");
+            return;
+        }
+
+        currentPhone = phone;
+
+        database.ref('customers/' + currentPhone).on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                customerData = snapshot.val();
+                if (customerData.name) {
+                    document.getElementById('custName').value = customerData.name;
+                }
+            } else {
+                customerData = { name: "", amount: 0, stamps: 0 };
+            }
+            checkPendingAndRender();
+        });
+    }
+
+    function checkPendingAndRender() {
+        database.ref('requests/' + currentPhone).on('value', (snapshot) => {
+            const myPending = snapshot.exists() ? snapshot.val() : null;
+            updateUI(myPending);
+        });
+    }
+
+    function updateUI(myPending) {
+        document.getElementById('display-name').innerText = "Customer: " + (customerData.name || (currentPhone ? "New Customer" : "Please Enter Phone"));
+        document.getElementById('display-phone').innerText = "Phone: " + (currentPhone || "--");
+        document.getElementById('display-amount').innerText = "Last Bill Amount: ₹" + (customerData.amount || 0);
+
+        for (let i = 1; i <= 5; i++) {
+            const slot = document.getElementById(`slot-${i}`);
+            if (i <= customerData.stamps) {
+                slot.classList.add('active');
+                slot.innerText = (i === 5) ? "🎁" : "✓";
+            } else {
+                slot.classList.remove('active');
+                slot.innerText = (i === 5) ? "🎁" : i;
+            }
+        }
+
+        const statusMsg = document.getElementById('status-message');
+        const rewardMsg = document.getElementById('reward-message');
+        const giftDisplay = document.getElementById('gift-name-display');
+        const reqSection = document.getElementById('request-section');
+
+        if (!currentPhone) {
+            statusMsg.style.display = 'block';
+            rewardMsg.style.display = 'none';
+            reqSection.style.display = 'flex';
+            statusMsg.innerHTML = "Enter phone number above to check card.";
+            return;
+        }
+
+        if (customerData.stamps < 5) {
+            statusMsg.style.display = 'block';
+            rewardMsg.style.display = 'none';
+            reqSection.style.display = 'flex';
+            if (myPending) {
+                statusMsg.innerHTML = `<span style="color:#D97706;">⏳ Stamp Request Sent for ₹${myPending.amount}! Waiting for Approval...</span>`;
+            } else {
+                const rem = 5 - customerData.stamps;
+                statusMsg.innerHTML = `Collect <b>${rem}</b> more stamp${rem > 1 ? 's' : ''} to unlock Gift!`;
+            }
+        } else {
+            statusMsg.style.display = 'none';
+            rewardMsg.style.display = 'block';
+            reqSection.style.display = 'none';
+            giftDisplay.innerText = "🎁 " + (customerData.amount >= 1000 ? GIFT_ABOVE_1000 : GIFT_BELOW_1000);
+        }
+    }
+
+    function sendStampRequest() {
+        const rawPhone = document.getElementById('searchPhone').value.trim();
+        const phone = sanitizePhone(rawPhone);
+        const name = document.getElementById('custName').value.trim();
+        const amount = parseFloat(document.getElementById('billAmount').value);
+
+        if (!phone || phone.length < 10 || !name || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid Phone Number, Name, and Bill Amount!");
+            return;
+        }
+
+        currentPhone = phone;
+
+        database.ref('requests/' + phone).once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                alert("You already have a pending request! Please wait for Cashier approval.");
+                return;
+            }
+
+            database.ref('requests/' + phone).set({
+                phone: phone,
+                name: name,
+                amount: amount,
+                timestamp: Date.now()
+            }, (error) => {
+                if (error) {
+                    alert("Failed to send request: " + error.message);
+                } else {
+                    document.getElementById('billAmount').value = "";
+                    loadCustomerCard();
+                    alert("Request sent to Admin successfully!");
+                }
+            });
+        });
+    }
+
+    function claimAndResetCard() {
+        if (!currentPhone) return;
+
+        if (confirm("Have you received your gift? Clicking OK will reset your stamps to start a new card!")) {
+            database.ref('customers/' + currentPhone).update({
+                stamps: 0
+            }, (error) => {
+                if (error) {
+                    alert("Error resetting card: " + error.message);
+                } else {
+                    alert("Congratulations! Your card has been reset for new stamps.");
+                }
+            });
+        }
+    }
+</script>
+
+</body>
+</html>
