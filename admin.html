@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Loyalty Card</title>
+    <title>Fuezo Admin Dashboard</title>
+    
+    <!-- Open Graph Meta Tags for WhatsApp Link Preview -->
+    <meta property="og:title" content="Fuezo - Check Your Loyalty Stamps 🧇">
+    <meta property="og:description" content="View your earned stamps and unlocked gift rewards!">
+    <meta property="og:url" content="https://fuezogift.pages.dev">
+    <meta property="og:type" content="website">
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #6F2932;
-            --primary-dark: #4A1B22;
-            --gold: #FFB800;
+            --primary-light: #FFF0F2;
             --bg: #F8FAFC;
             --card-bg: #FFFFFF;
-            --text-main: #0F172A;
+            --text-dark: #0F172A;
             --text-muted: #64748B;
+            --border: #E2E8F0;
             --success: #10B981;
             --danger: #EF4444;
-            --border: #E2E8F0;
+            --whatsapp: #25D366;
+            --gold: #D97706;
+            --gold-bg: #FEF3C7;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,13 +33,12 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
-            color: var(--text-main);
+            color: var(--text-dark);
             padding: 24px 16px;
-            min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
@@ -38,60 +46,61 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
             background: var(--card-bg);
-            padding: 20px 24px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 16px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
         .brand-title {
             font-size: 20px;
             font-weight: 800;
             color: var(--primary);
-            text-transform: uppercase;
+            letter-spacing: -0.5px;
         }
 
-        .section-card {
+        .card {
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: 20px;
             border: 1px solid var(--border);
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        /* Highlighting Pending Requests Top Box */
-        .requests-card {
-            border: 2px solid #F59E0B;
-            background: #FFFBEB;
+        .card-requests {
+            border: 1px solid #FCD34D;
+            background: #FFFDF5;
         }
 
-        .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 16px;
+        .card-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 8px;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
         }
 
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            gap: 12px;
         }
 
-        .input-group {
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -103,97 +112,87 @@
             color: var(--text-muted);
         }
 
-        .input-field {
-            padding: 12px 14px;
+        input {
+            padding: 10px 12px;
             border: 1px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             font-family: inherit;
             font-size: 13px;
             outline: none;
             transition: all 0.2s;
-            background: #ffffff;
+            background: #FAFAFA;
         }
 
-        .input-field:focus {
+        input:focus {
+            background: #FFFFFF;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(111, 41, 50, 0.1);
+            box-shadow: 0 0 0 3px rgba(111, 41, 50, 0.08);
         }
 
         .btn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 10px 16px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
+            border: none;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            text-decoration: none;
         }
 
-        .btn:hover { opacity: 0.95; transform: translateY(-1px); }
-
-        .btn-success { background: linear-gradient(135deg, #10B981, #059669); }
-        .btn-danger { background: linear-gradient(135deg, #EF4444, #DC2626); }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
             font-size: 13px;
         }
 
         th {
+            text-align: left;
+            padding: 10px 12px;
             background: #F1F5F9;
-            padding: 12px 16px;
-            font-weight: 700;
             color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 12px;
         }
 
         td {
-            padding: 14px 16px;
+            padding: 12px;
             border-bottom: 1px solid var(--border);
-            color: var(--text-main);
+            vertical-align: middle;
         }
 
         .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
+            padding: 4px 8px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 700;
             display: inline-block;
         }
 
-        .badge-gold { background: #FEF3C7; color: #D97706; }
-        .badge-primary { background: #FCE7F3; color: var(--primary); }
-        .badge-count { background: #EF4444; color: #FFFFFF; border-radius: 50px; padding: 2px 8px; font-size: 12px; }
+        .badge-stamp { background: var(--primary-light); color: var(--primary); }
+        .badge-gift { background: var(--gold-bg); color: var(--gold); }
+        .badge-count { background: var(--danger); color: white; border-radius: 20px; padding: 2px 8px; }
 
-        .empty-state {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 8px;
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
         .helper-text {
             font-size: 11px;
-            color: #10B981;
+            color: var(--success);
             font-weight: 600;
-            margin-top: 2px;
             display: none;
         }
     </style>
@@ -204,78 +203,78 @@
 <body>
 
 <div class="container">
+    <!-- HEADER -->
     <div class="header">
-        <div class="brand-title">Admin Dashboard</div>
-        <div style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Manage Requests & Loyalty Cards</div>
+        <div class="brand-title">Fuezo Admin</div>
+        <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Loyalty Management</span>
     </div>
 
-    <!-- 1. PENDING STAMP REQUESTS SECTION (TOP PRIORITY VISIBILITY) -->
-    <div class="section-card requests-card">
-        <div class="section-title" style="color: #B45309;">
-            <span>📩 Pending Stamp Requests</span>
-            <span id="req-count-badge" class="badge badge-count">0</span>
+    <!-- PENDING REQUESTS -->
+    <div class="card card-requests">
+        <div class="card-header">
+            <span class="card-title" style="color: #B45309;">📩 Pending Stamp Requests</span>
+            <span id="req-count" class="badge badge-count">0</span>
         </div>
-        <div class="table-responsive">
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Customer Name</th>
+                        <th>Customer</th>
                         <th>Phone</th>
-                        <th>Bill Amount</th>
-                        <th>Current Stamps</th>
-                        <th>Current Total Spent</th>
-                        <th>Eligible Gift (At 5th)</th>
-                        <th>Actions</th>
+                        <th>Bill</th>
+                        <th>Stamps</th>
+                        <th>Eligible Gift</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="requests-tbody">
-                    <tr><td colspan="7" class="empty-state">Loading pending requests...</td></tr>
+                    <tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--text-muted);">Loading requests...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- 2. DIRECT ADD CUSTOMER SECTION WITH AUTO-FILL -->
-    <div class="section-card" style="border-left: 5px solid var(--primary);">
-        <div class="section-title">➕ Add New Stamp / Customer Manually</div>
+    <!-- ADD STAMP MANUALLY -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom: 16px;">➕ Add Stamp / New Customer</div>
         <div class="grid-3">
-            <div class="input-group">
+            <div class="form-group">
                 <label>Phone Number</label>
-                <input type="tel" id="addCustPhone" class="input-field" placeholder="10-digit Mobile Number" oninput="autoFetchName()">
-                <span id="auto-fill-status" class="helper-text">✓ Existing Customer Found!</span>
+                <input type="tel" id="addPhone" placeholder="10-digit number" oninput="autoFetchName()">
+                <span id="auto-status" class="helper-text">✓ Customer Found</span>
             </div>
-            <div class="input-group">
+            <div class="form-group">
                 <label>Customer Name</label>
-                <input type="text" id="addCustName" class="input-field" placeholder="Enter Name">
+                <input type="text" id="addName" placeholder="Enter name">
             </div>
-            <div class="input-group">
+            <div class="form-group">
                 <label>Bill Amount (₹)</label>
-                <input type="number" id="addBillAmount" class="input-field" placeholder="Enter Bill Amount">
+                <input type="number" id="addAmount" placeholder="Enter amount">
             </div>
         </div>
-        <button class="btn btn-success" style="margin-top: 16px;" onclick="manualAddCustomer()">➕ Add / Update Customer</button>
+        <button class="btn btn-primary" style="margin-top: 14px; width: 100%;" onclick="manualAddCustomer()">+ Add Stamp & Update</button>
     </div>
 
-    <!-- 3. GIFT SETTINGS SECTION -->
-    <div class="section-card">
-        <div class="section-title">⚙️ Configure Gifts (Based on Total Spent)</div>
+    <!-- GIFT SETTINGS -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom: 16px;">⚙️ Gift Rewards Configuration</div>
         <div class="grid-2">
-            <div class="input-group">
-                <label>Gift for Total Spent Below ₹1000</label>
-                <input type="text" id="giftBelow" class="input-field" placeholder="e.g., Standard Dessert">
+            <div class="form-group">
+                <label>Gift for Spent < ₹1000</label>
+                <input type="text" id="giftBelow" placeholder="e.g. Regular Waffle">
             </div>
-            <div class="input-group">
-                <label>Gift for Total Spent ₹1000 & Above</label>
-                <input type="text" id="giftAbove" class="input-field" placeholder="e.g., Premium Waffle">
+            <div class="form-group">
+                <label>Gift for Spent ≥ ₹1000</label>
+                <input type="text" id="giftAbove" placeholder="e.g. Premium Dessert">
             </div>
         </div>
-        <button class="btn" style="margin-top: 16px;" onclick="saveGiftSettings()">💾 Save Settings</button>
+        <button class="btn btn-primary" style="margin-top: 14px;" onclick="saveGiftSettings()">Save Rewards</button>
     </div>
 
-    <!-- 4. APPROVED CUSTOMERS LIST SECTION -->
-    <div class="section-card">
-        <div class="section-title">👥 All Active Customers</div>
-        <div class="table-responsive">
+    <!-- CUSTOMERS LIST -->
+    <div class="card">
+        <div class="card-title" style="margin-bottom: 16px;">👥 Active Customers</div>
+        <div class="table-container">
             <table>
                 <thead>
                     <tr>
@@ -283,12 +282,12 @@
                         <th>Phone</th>
                         <th>Stamps</th>
                         <th>Last Bill</th>
-                        <th>Total Spent (Admin Only)</th>
-                        <th>Unlocked Gift</th>
+                        <th>Gift Status</th>
+                        <th>WhatsApp Thank You</th>
                     </tr>
                 </thead>
                 <tbody id="customers-tbody">
-                    <tr><td colspan="6" class="empty-state">Loading customers data...</td></tr>
+                    <tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--text-muted);">Loading customers...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -311,7 +310,7 @@
     const database = firebase.database();
 
     let configuredGiftBelow = "Standard Gift 🎁";
-    let configuredGiftAbove = "Premium Dessert Waffle 🧇";
+    let configuredGiftAbove = "Premium Dessert 🧇";
 
     window.onload = function() {
         loadSettings();
@@ -320,7 +319,7 @@
     };
 
     function sanitizePhone(phone) {
-        return phone.replace(/\D/g, '');
+        return phone ? phone.toString().replace(/\D/g, '') : '';
     }
 
     function loadSettings() {
@@ -329,7 +328,6 @@
                 const gifts = snapshot.val();
                 configuredGiftBelow = gifts.below1000 || configuredGiftBelow;
                 configuredGiftAbove = gifts.above1000 || configuredGiftAbove;
-
                 document.getElementById('giftBelow').value = configuredGiftBelow;
                 document.getElementById('giftAbove').value = configuredGiftAbove;
             }
@@ -339,17 +337,10 @@
     function saveGiftSettings() {
         const below = document.getElementById('giftBelow').value.trim();
         const above = document.getElementById('giftAbove').value.trim();
+        if (!below || !above) return alert("Please fill both gifts!");
 
-        if (!below || !above) {
-            alert("Please enter both gift titles!");
-            return;
-        }
-
-        database.ref('settings/gifts').set({
-            below1000: below,
-            above1000: above
-        }, (error) => {
-            if (error) alert("Error saving settings: " + error.message);
+        database.ref('settings/gifts').set({ below1000: below, above1000: above }, (err) => {
+            if (err) alert("Error saving settings!");
             else alert("Gift settings saved successfully!");
         });
     }
@@ -359,180 +350,178 @@
         return totalSpent >= 1000 ? configuredGiftAbove : configuredGiftBelow;
     }
 
-    // Auto-fetch Customer Name based on entered Phone Number
+    function sendWhatsAppMessage(phone, name, stamps, gift) {
+        const cleanPhone = sanitizePhone(phone);
+        const formattedPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+        const customerWebsiteUrl = `https://fuezogift.pages.dev?phone=${cleanPhone}`;
+
+        let text = `Hi ${name || 'Customer'}! 👋\n\nThank you for purchasing at *Fuezo*! ❤️\n\n⭐ *Your Loyalty Stamps:* ${stamps}/5`;
+
+        if (stamps >= 5) {
+            text += `\n\n🎉 *CONGRATULATIONS!* You unlocked your reward: *${gift || 'Special Gift'}*!\nShow this message at counter to claim on your next visit. 🥳`;
+        } else {
+            text += `\nCollect ${5 - stamps} more stamp(s) to unlock a FREE gift at *Fuezo*! 🧇✨`;
+        }
+
+        text += `\n\n👉 *[Check Your Stamps Here]*\n${customerWebsiteUrl}`;
+        text += `\n\nSee you again soon!\n- *Team Fuezo* 🍨`;
+
+        const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+
     function autoFetchName() {
-        const rawPhone = document.getElementById('addCustPhone').value.trim();
-        const phone = sanitizePhone(rawPhone);
-        const nameField = document.getElementById('addCustName');
-        const statusSpan = document.getElementById('auto-fill-status');
+        const phone = sanitizePhone(document.getElementById('addPhone').value.trim());
+        const nameField = document.getElementById('addName');
+        const status = document.getElementById('auto-status');
 
         if (phone.length === 10) {
-            database.ref('customers/' + phone).once('value').then((snapshot) => {
-                if (snapshot.exists() && snapshot.val().name) {
-                    nameField.value = snapshot.val().name;
-                    statusSpan.style.display = 'block';
+            database.ref('customers/' + phone).once('value').then((snap) => {
+                if (snap.exists() && snap.val().name) {
+                    nameField.value = snap.val().name;
+                    status.style.display = 'block';
                 } else {
-                    statusSpan.style.display = 'none';
+                    status.style.display = 'none';
                 }
             });
         } else {
-            statusSpan.style.display = 'none';
+            status.style.display = 'none';
         }
     }
 
-    // Manual Add / Update Customer Function
     function manualAddCustomer() {
-        const name = document.getElementById('addCustName').value.trim();
-        const rawPhone = document.getElementById('addCustPhone').value.trim();
-        const phone = sanitizePhone(rawPhone);
-        const amount = parseFloat(document.getElementById('addBillAmount').value);
+        const name = document.getElementById('addName').value.trim();
+        const phone = sanitizePhone(document.getElementById('addPhone').value.trim());
+        const amount = parseFloat(document.getElementById('addAmount').value);
 
-        if (!name || !phone || phone.length < 10 || isNaN(amount) || amount <= 0) {
-            alert("Please enter a valid Name, 10-digit Phone Number, and Bill Amount!");
+        if (!name || phone.length < 10 || isNaN(amount) || amount <= 0) {
+            alert("Please fill valid Name, Phone & Amount!");
             return;
         }
 
-        database.ref('customers/' + phone).once('value').then((snapshot) => {
-            let currentStamps = 0;
-            let currentSpent = 0;
-
-            if (snapshot.exists()) {
-                const c = snapshot.val();
-                currentStamps = c.stamps || 0;
-                currentSpent = c.totalSpent || 0;
+        database.ref('customers/' + phone).once('value').then((snap) => {
+            let stamps = 0, spent = 0;
+            if (snap.exists()) {
+                stamps = snap.val().stamps || 0;
+                spent = snap.val().totalSpent || 0;
             }
 
-            const newStamps = currentStamps + 1;
-            const newTotalSpent = currentSpent + amount;
-
-            let assignedGift = "";
-            if (newStamps >= 5) {
-                assignedGift = getEligibleGift(newTotalSpent, newStamps);
-            }
+            const newStamps = stamps + 1;
+            const newSpent = spent + amount;
+            const assignedGift = newStamps >= 5 ? getEligibleGift(newSpent, newStamps) : "";
 
             database.ref('customers/' + phone).set({
                 name: name,
                 stamps: newStamps,
                 lastAmount: amount,
-                totalSpent: newTotalSpent,
+                totalSpent: newSpent,
                 gift: assignedGift
-            }, (error) => {
-                if (error) {
-                    alert("Failed to add customer: " + error.message);
-                } else {
-                    alert(`Successfully added/updated customer ${name}! New Stamp: ${newStamps}/5`);
-                    document.getElementById('addCustName').value = '';
-                    document.getElementById('addCustPhone').value = '';
-                    document.getElementById('addBillAmount').value = '';
-                    document.getElementById('auto-fill-status').style.display = 'none';
+            }, (err) => {
+                if (!err) {
+                    if (confirm(`Stamp updated! Send Fuezo Thank You message to ${name}?`)) {
+                        sendWhatsAppMessage(phone, name, newStamps, assignedGift);
+                    }
+                    document.getElementById('addName').value = '';
+                    document.getElementById('addPhone').value = '';
+                    document.getElementById('addAmount').value = '';
+                    document.getElementById('auto-status').style.display = 'none';
                 }
             });
         });
     }
 
     function listenToRequests() {
-        database.ref('requests').on('value', (snapshot) => {
+        database.ref('requests').on('value', (snap) => {
             const tbody = document.getElementById('requests-tbody');
-            const reqBadge = document.getElementById('req-count-badge');
+            const reqBadge = document.getElementById('req-count');
             tbody.innerHTML = '';
 
-            if (!snapshot.exists()) {
-                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No pending requests 🎉</td></tr>';
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 16px; color: var(--text-muted);">No pending requests 🎉</td></tr>';
                 reqBadge.innerText = '0';
                 return;
             }
 
-            const requests = snapshot.val();
-            const count = Object.keys(requests).length;
-            reqBadge.innerText = count;
+            const requests = snap.val();
+            const keys = Object.keys(requests);
+            reqBadge.innerText = keys.length;
 
-            for (let phone in requests) {
+            keys.forEach((phone) => {
                 const req = requests[phone];
-
                 database.ref('customers/' + phone).once('value').then((custSnap) => {
-                    let currentStamps = 0;
-                    let currentSpent = 0;
-
+                    let stamps = 0, spent = 0;
                     if (custSnap.exists()) {
-                        const c = custSnap.val();
-                        currentStamps = c.stamps || 0;
-                        currentSpent = c.totalSpent || 0;
+                        stamps = custSnap.val().stamps || 0;
+                        spent = custSnap.val().totalSpent || 0;
                     }
-
-                    const newTotalSpent = currentSpent + req.amount;
-                    const nextStamp = currentStamps + 1;
-                    const eligibleGift = getEligibleGift(newTotalSpent, nextStamp);
+                    const eligibleGift = getEligibleGift(spent + req.amount, stamps + 1);
 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td><strong>${req.name}</strong></td>
-                        <td>${req.phone}</td>
-                        <td><span class="badge badge-primary">₹${req.amount}</span></td>
-                        <td>${currentStamps}/5</td>
-                        <td><strong>₹${currentSpent}</strong></td>
-                        <td><span class="badge badge-gold">${eligibleGift}</span></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-success" onclick="approveRequest('${req.phone}', '${req.name}', ${req.amount}, ${currentStamps}, ${currentSpent})">✓ Approve</button>
-                                <button class="btn btn-danger" onclick="rejectRequest('${req.phone}')">✕ Reject</button>
-                            </div>
+                        <td><strong>${req.name || 'Customer'}</strong></td>
+                        <td>${req.phone || phone}</td>
+                        <td>₹${req.amount || 0}</td>
+                        <td><span class="badge badge-stamp">${stamps}/5</span></td>
+                        <td><span class="badge badge-gift">${eligibleGift}</span></td>
+                        <td style="display:flex; gap: 4px;">
+                            <button class="btn btn-success" style="padding: 6px 10px;" onclick="approveRequest('${phone}', '${req.name || 'Customer'}', ${req.amount || 0}, ${stamps}, ${spent})">✓</button>
+                            <button class="btn btn-danger" style="padding: 6px 10px;" onclick="rejectRequest('${phone}')">✕</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-            }
+            });
         });
     }
 
     function approveRequest(phone, name, amount, currentStamps, currentSpent) {
         const newStamps = currentStamps + 1;
-        const newTotalSpent = currentSpent + amount;
-        
-        let assignedGift = "";
-        if (newStamps >= 5) {
-            assignedGift = getEligibleGift(newTotalSpent, newStamps);
-        }
+        const newSpent = currentSpent + amount;
+        const assignedGift = newStamps >= 5 ? getEligibleGift(newSpent, newStamps) : "";
 
         database.ref('customers/' + phone).set({
             name: name,
             stamps: newStamps,
             lastAmount: amount,
-            totalSpent: newTotalSpent,
+            totalSpent: newSpent,
             gift: assignedGift
         }).then(() => {
-            return database.ref('requests/' + phone).remove();
-        }).catch((err) => {
-            alert("Error approving request: " + err.message);
+            database.ref('requests/' + phone).remove();
+            if (confirm(`Approved! Send WhatsApp message to ${name}?`)) {
+                sendWhatsAppMessage(phone, name, newStamps, assignedGift);
+            }
         });
     }
 
     function rejectRequest(phone) {
-        if (confirm("Are you sure you want to reject this request?")) {
-            database.ref('requests/' + phone).remove();
-        }
+        if (confirm("Reject request?")) database.ref('requests/' + phone).remove();
     }
 
     function listenToCustomers() {
-        database.ref('customers').on('value', (snapshot) => {
+        database.ref('customers').on('value', (snap) => {
             const tbody = document.getElementById('customers-tbody');
             tbody.innerHTML = '';
 
-            if (!snapshot.exists()) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No customers recorded yet.</td></tr>';
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 16px; color: var(--text-muted);">No active customers</td></tr>';
                 return;
             }
 
-            const customers = snapshot.val();
+            const customers = snap.val();
             for (let phone in customers) {
                 const c = customers[phone];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><strong>${c.name || 'Unknown'}</strong></td>
+                    <td><strong>${c.name || 'Customer'}</strong></td>
                     <td>${phone}</td>
-                    <td><span class="badge badge-primary">${c.stamps || 0}/5</span></td>
+                    <td><span class="badge badge-stamp">${c.stamps || 0}/5</span></td>
                     <td>₹${c.lastAmount || 0}</td>
-                    <td><strong>₹${c.totalSpent || 0}</strong></td>
-                    <td><span class="badge badge-gold">${c.gift || (c.stamps >= 5 ? getEligibleGift(c.totalSpent, c.stamps) : 'Pending 5th Stamp')}</span></td>
+                    <td><span class="badge badge-gift">${c.gift || (c.stamps >= 5 ? getEligibleGift(c.totalSpent, c.stamps) : 'In Progress')}</span></td>
+                    <td>
+                        <button class="btn btn-whatsapp" style="padding: 6px 10px;" onclick="sendWhatsAppMessage('${phone}', '${c.name || 'Customer'}', ${c.stamps || 0}, '${c.gift || ''}')">
+                            💬 Message
+                        </button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             }
