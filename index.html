@@ -171,7 +171,6 @@
             color: var(--text-muted);
         }
 
-        /* GIFT UNLOCKED ANIMATION BOX */
         .reward-unlocked {
             display: none;
             background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
@@ -228,7 +227,6 @@
 
         .input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 
-        /* CUSTOM STYLED POPUP MODAL */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -333,7 +331,6 @@
 
         <div id="status-message" class="status-box">Enter phone number above to view your card</div>
 
-        <!-- ANIMATED GIFT UNLOCKED CARD -->
         <div id="reward-message" class="reward-unlocked">
             <div class="gift-icon-anim">🎉 🎁 🎉</div><br>
             <span style="font-size:13px; font-weight:600; color:#047857;">CONGRATULATIONS! YOU UNLOCKED:</span>
@@ -349,7 +346,6 @@
     </div>
 </div>
 
-<!-- BEAUTIFUL CUSTOM POPUP MODAL -->
 <div class="modal-overlay" id="customModal">
     <div class="modal-card">
         <div class="modal-icon" id="modalIcon">⚠️</div>
@@ -382,20 +378,33 @@
     let currentPhone = "";
     let customerData = { name: "", lastAmount: 0, totalSpent: 0, stamps: 0, gift: "" };
     let hasTriggeredConfetti = false;
+    let customerListener = null;
+    let requestListener = null;
 
-    database.ref('settings/gifts').on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            const gifts = snapshot.val();
-            if (gifts.below1000) configuredGiftBelow = gifts.below1000;
-            if (gifts.above1000) configuredGiftAbove = gifts.above1000;
+    window.onload = function() {
+        // Auto fetch phone from URL parameter (?phone=9876543210)
+        const urlParams = new URLSearchParams(window.location.search);
+        const phoneParam = urlParams.get('phone');
+        
+        if (phoneParam) {
+            const clean = sanitizePhone(phoneParam);
+            document.getElementById('searchPhone').value = clean;
+            loadCustomerCard();
         }
-    });
+
+        database.ref('settings/gifts').on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                const gifts = snapshot.val();
+                if (gifts.below1000) configuredGiftBelow = gifts.below1000;
+                if (gifts.above1000) configuredGiftAbove = gifts.above1000;
+            }
+        });
+    };
 
     function sanitizePhone(phone) {
-        return phone.replace(/\D/g, '');
+        return phone ? phone.toString().replace(/\D/g, '') : '';
     }
 
-    // CUSTOM MODAL POPUP TRIGGER
     function showCustomModal(icon, title, message, actionsHtml) {
         document.getElementById('modalIcon').innerText = icon;
         document.getElementById('modalTitle').innerText = title;
@@ -426,6 +435,11 @@
 
         if (currentPhone !== phone) {
             hasTriggeredConfetti = false;
+            // Detach previous listeners if active
+            if (currentPhone) {
+                database.ref('customers/' + currentPhone).off();
+                database.ref('requests/' + currentPhone).off();
+            }
         }
 
         currentPhone = phone;
@@ -562,7 +576,6 @@
         });
     }
 
-    // OPEN CUSTOM CLAIM MODAL
     function openClaimModal() {
         const actions = `
             <button class="btn btn-modal-cancel" onclick="closeModal()">Cancel</button>
